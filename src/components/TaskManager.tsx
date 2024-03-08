@@ -1,25 +1,26 @@
 import { nanoid } from "nanoid";
-import { useState } from "react";
+import React, { useState } from "react";
 import "./TaskManager.css";
 
-// TODO: create custom hook to manage task state
-export const TaskManager = () => {
-  const [title, setTitle] = useState("");
-  const [searchKeyword, setSearchKeyword] = useState("");
-  const [tasks, setTasks] = useState([]);
+interface Task {
+  id: string;
+  title: string;
+}
+
+export const TaskManager: React.FC = () => {
+  const [title, setTitle] = useState<string>("");
+  const [searchKeyword, setSearchKeyword] = useState<string>("");
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   // remove task from list
-  const completeTask = (id) => {
+  const completeTask = (id: string) => {
     setTasks(tasks.filter((task) => task.id !== id));
   };
 
-  const updateTask = (id, taskUpdate) => {
-    const newTasks = tasks.slice();
-
+  const updateTask = (id: string, taskUpdate: Partial<Task>) => {
+    const newTasks = [...tasks];
     const index = tasks.findIndex((task) => task.id === id);
-
-    newTasks[index] = taskUpdate;
-
+    newTasks[index] = { ...newTasks[index], ...taskUpdate };
     setTasks(newTasks);
   };
 
@@ -28,7 +29,7 @@ export const TaskManager = () => {
       return;
     }
 
-    const newTask = {
+    const newTask: Task = {
       // using nanoid to generate unique id
       id: nanoid(),
       title,
@@ -37,12 +38,12 @@ export const TaskManager = () => {
     setTitle("");
   };
 
-  const handleSearch = (ev) => {
+  const handleSearch = (ev: React.ChangeEvent<HTMLInputElement>) => {
     setSearchKeyword(ev.target.value);
   };
 
   const filteredTasks = tasks.filter((task) =>
-    task.title.toLowerCase().includes(searchKeyword.toLowerCase()),
+    task.title.toLowerCase().includes(searchKeyword.toLowerCase())
   );
 
   return (
@@ -50,7 +51,12 @@ export const TaskManager = () => {
       <h1>Task Manager</h1>
 
       <div>
-        <input type="text" onChange={handleSearch} placeholder="Search Task" />
+        <input
+          type="text"
+          onChange={handleSearch}
+          placeholder="Search Task"
+          value={searchKeyword}
+        />
       </div>
 
       <div className="task">
